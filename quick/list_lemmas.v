@@ -85,3 +85,12 @@ Proof.
     intro H; inversion_clear H.
     Reconstr.reasy (@Coq.Lists.List.Forall_cons, @Forall_1) Reconstr.Empty.
 Qed.
+
+Lemma lem_lst_paper :
+  forall (A : Type) (l1 l2 : list A) (x y1 y2 y3 : A),
+    In x l1 \/ In x l2 \/ x = y1 \/ In x (y2 :: y3 :: nil) ->
+    In x (y1 :: (l1 ++ (y2 :: (l2 ++ (y3 :: nil))))).
+Proof.
+  hammer_hook "list_lemmas" "list_lemmas.lem_lst_paper".
+  sauto.
+Qed.
