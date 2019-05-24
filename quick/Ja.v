@@ -620,9 +620,8 @@ Proof.
   +  hammer_hook "JaSyntax" "JaSyntax.find_class_decompose_program.subgoal_1".
      exists [], P; auto.
   +  hammer_hook  "JaSyntax" "JaSyntax.find_class_decompose_program.subgoal_2".
-     Reconstr.hobvious (@IHP, @H)
-                       (@Coq.Lists.List.app_comm_cons)
-                       Reconstr.Empty.
+     assert (HH: exists P0 P1 : list JFClassDeclaration, P = P0 ++ D :: P1) by ycrush.
+     Reconstr.rcrush (@Coq.Lists.List.app_comm_cons) Reconstr.Empty.
 Qed.
 
 Lemma find_class_lift_cons:
@@ -1762,10 +1761,8 @@ Lemma subtype_well_founded_decompose_program:
 Proof.
   induction P.
   + sauto.
-  + try hammer_hook "JaSubtype" "JaSubtype.subtype_well_founded_decompose_program.subgoal_2".
-    Reconstr.hobvious (@IHP)
-                      (@Coq.Lists.List.Forall_forall, @Coq.Lists.List.Forall_cons, @Coq.Init.Datatypes.list_ind, @Coq.Lists.List.app_comm_cons, @is_class_and_occ_zero, @JaProgram.names_unique_compose, @JaProgram.names_unique_further, @subtype_well_founded_further, @JaProgram.names_unique_decompose_program)
-                      (@Coq.Lists.List.In, @JaSyntax.JFClassName, @Coq.Lists.List.count_occ, @Coq.Lists.List.map, @Coq.Init.Datatypes.app, @JaSyntax.find_class, @JaProgram.names_unique, @number_of_extends, @JaSyntax.JFProgram, @subtype_well_founded).
+  + hammer_hook "JaSubtype" "JaSubtype.subtype_well_founded_decompose_program.subgoal_2".
+    Reconstr.rcrush (@Coq.Lists.List.app_comm_cons, @JaSubtype.subtype_well_founded_further, @JaProgram.names_unique_further) (@JaSyntax.JFProgram).
 Qed.
 
 Lemma subtype_get_superclass:
@@ -1778,7 +1775,7 @@ Lemma subtype_get_superclass:
 Proof.
   induction P.
   + scrush.
-  + try hammer_hook "JaSubtype" "JaSubtype.subtype_get_superclass.subgoal_2".
+  + hammer_hook "JaSubtype" "JaSubtype.subtype_get_superclass.subgoal_2".
     intros.
     destruct a.
     assert ({D=ex}+{D<>ex}) by apply JFClassName_dec; destruct H2; auto.

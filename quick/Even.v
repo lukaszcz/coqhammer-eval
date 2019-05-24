@@ -33,8 +33,8 @@ Hint Constructors odd: arith.
 
 
 Lemma even_equiv : forall n, even n <-> Nat.Even n.
-Proof. hammer_hook "Even" "Even.even_equiv".  
-fix 1.
+Proof. hammer_hook "Even" "Even.even_equiv".
+fix even_equiv 1.
 destruct n as [|[|n]]; simpl.
 - split; [now exists 0 | constructor].
 - split.
@@ -47,8 +47,8 @@ split.
 Qed.
 
 Lemma odd_equiv : forall n, odd n <-> Nat.Odd n.
-Proof. hammer_hook "Even" "Even.odd_equiv".  
-fix 1.
+Proof. hammer_hook "Even" "Even.odd_equiv".
+fix odd_equiv 1.
 destruct n as [|[|n]]; simpl.
 - split.
 + inversion_clear 1.
@@ -63,21 +63,21 @@ Qed.
 
 
 Lemma even_or_odd n : even n \/ odd n.
-Proof. hammer_hook "Even" "Even.even_or_odd".  
+Proof. hammer_hook "Even" "Even.even_or_odd".
 induction n.
 - auto with arith.
 - elim IHn; auto with arith.
 Qed.
 
 Lemma even_odd_dec n : {even n} + {odd n}.
-Proof. hammer_hook "Even" "Even.even_odd_dec".  
+Proof. hammer_hook "Even" "Even.even_odd_dec".
 induction n.
 - auto with arith.
 - elim IHn; auto with arith.
 Defined.
 
 Lemma not_even_and_odd n : even n -> odd n -> False.
-Proof. hammer_hook "Even" "Even.not_even_and_odd".  
+Proof. hammer_hook "Even" "Even.not_even_and_odd".
 induction n.
 - intros Ev Od. inversion Od.
 - intros Ev Od. inversion Ev. inversion Od. auto with arith.

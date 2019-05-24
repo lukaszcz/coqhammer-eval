@@ -30,7 +30,7 @@ Local Open Scope string_scope.
 
 
 Definition string_dec : forall s1 s2 : string, {s1 = s2} + {s1 <> s2}.
-Proof. hammer_hook "String" "String.string_dec".  
+Proof. hammer_hook "String" "String.string_dec".
 decide equality; apply ascii_dec.
 Defined.
 
@@ -72,15 +72,15 @@ end.
 
 Theorem get_correct :
 forall s1 s2 : string, (forall n : nat, get n s1 = get n s2) <-> s1 = s2.
-Proof. hammer_hook "String" "String.get_correct".  
+Proof. hammer_hook "String" "String.get_correct".
 intros s1; elim s1; simpl.
 intros s2; case s2; simpl; split; auto.
-intros H; generalize (H 0); intros H1; inversion H1.
+intros H; generalize (H O); intros H1; inversion H1.
 intros; discriminate.
 intros a s1' Rec s2; case s2; simpl; split; auto.
-intros H; generalize (H 0); intros H1; inversion H1.
+intros H; generalize (H O); intros H1; inversion H1.
 intros; discriminate.
-intros H; generalize (H 0); simpl; intros H1; inversion H1.
+intros H; generalize (H O); simpl; intros H1; inversion H1.
 case (Rec s).
 intros H0; rewrite H0; auto.
 intros n; exact (H (S n)).
@@ -94,7 +94,7 @@ Qed.
 Theorem append_correct1 :
 forall (s1 s2 : string) (n : nat),
 n < length s1 -> get n s1 = get n (s1 ++ s2).
-Proof. hammer_hook "String" "String.append_correct1".  
+Proof. hammer_hook "String" "String.append_correct1".
 intros s1; elim s1; simpl; auto.
 intros s2 n H; inversion H.
 intros a s1' Rec s2 n; case n; simpl; auto.
@@ -107,11 +107,11 @@ Qed.
 Theorem append_correct2 :
 forall (s1 s2 : string) (n : nat),
 get n s2 = get (n + length s1) (s1 ++ s2).
-Proof. hammer_hook "String" "String.append_correct2".  
+Proof. hammer_hook "String" "String.append_correct2".
 intros s1; elim s1; simpl; auto.
 intros s2 n; rewrite plus_comm; simpl; auto.
 intros a s1' Rec s2 n; case n; simpl; auto.
-generalize (Rec s2 0); simpl; auto. intros.
+generalize (Rec s2 O); simpl; auto. intros.
 rewrite <- Plus.plus_Snm_nSm; auto.
 Qed.
 
@@ -121,9 +121,9 @@ Qed.
 
 Fixpoint substring (n m : nat) (s : string) : string :=
 match n, m, s with
-| 0, 0, _ => EmptyString
-| 0, S m', EmptyString => s
-| 0, S m', String c s' => String c (substring 0 m' s')
+| O, O, _ => EmptyString
+| O, S m', EmptyString => s
+| O, S m', String c s' => String c (substring 0 m' s')
 | S n', _, EmptyString => s
 | S n', _, String c s' => substring n' m s'
 end.
@@ -133,7 +133,7 @@ end.
 Theorem substring_correct1 :
 forall (s : string) (n m p : nat),
 p < m -> get p (substring n m s) = get (p + n) s.
-Proof. hammer_hook "String" "String.substring_correct1".  
+Proof. hammer_hook "String" "String.substring_correct1".
 intros s; elim s; simpl; auto.
 intros n; case n; simpl; auto.
 intros m; case m; simpl; auto.
@@ -150,7 +150,7 @@ Qed.
 
 Theorem substring_correct2 :
 forall (s : string) (n m p : nat), m <= p -> get p (substring n m s) = None.
-Proof. hammer_hook "String" "String.substring_correct2".  
+Proof. hammer_hook "String" "String.substring_correct2".
 intros s; elim s; simpl; auto.
 intros n; case n; simpl; auto.
 intros m; case m; simpl; auto.
@@ -185,7 +185,7 @@ end.
 Theorem prefix_correct :
 forall s1 s2 : string,
 prefix s1 s2 = true <-> substring 0 (length s1) s2 = s1.
-Proof. hammer_hook "String" "String.prefix_correct".  
+Proof. hammer_hook "String" "String.prefix_correct".
 intros s1; elim s1; simpl; auto.
 intros s2; case s2; simpl; split; auto.
 intros a s1' Rec s2; case s2; simpl; auto.
@@ -202,16 +202,16 @@ Qed.
 
 Fixpoint index (n : nat) (s1 s2 : string) : option nat :=
 match s2, n with
-| EmptyString, 0 =>
+| EmptyString, O =>
 match s1 with
-| EmptyString => Some 0
+| EmptyString => Some O
 | String a s1' => None
 end
 | EmptyString, S n' => None
-| String b s2', 0 =>
-if prefix s1 s2 then Some 0
+| String b s2', O =>
+if prefix s1 s2 then Some O
 else
-match index 0 s1 s2' with
+match index O s1 s2' with
 | Some n => Some (S n)
 | None => None
 end
@@ -230,7 +230,7 @@ Opaque prefix.
 Theorem index_correct1 :
 forall (n m : nat) (s1 s2 : string),
 index n s1 s2 = Some m -> substring m (length s1) s2 = s1.
-Proof. hammer_hook "String" "String.index_correct1".  
+Proof. hammer_hook "String" "String.index_correct1".
 intros n m s1 s2; generalize n m s1; clear n m s1; elim s2; simpl;
 auto.
 intros n; case n; simpl; auto.
@@ -246,7 +246,7 @@ intros H0 H; injection H as <-; auto.
 case H0; simpl; auto.
 case m; simpl; auto.
 case (index 0 s1 s2'); intros; discriminate.
-intros m'; generalize (Rec 0 m' s1); case (index 0 s1 s2'); auto.
+intros m'; generalize (Rec O m' s1); case (index 0 s1 s2'); auto.
 intros x H H0 H1; apply H; injection H1; auto.
 intros; discriminate.
 intros n'; case m; simpl; auto.
@@ -262,7 +262,7 @@ Theorem index_correct2 :
 forall (n m : nat) (s1 s2 : string),
 index n s1 s2 = Some m ->
 forall p : nat, n <= p -> p < m -> substring p (length s1) s2 <> s1.
-Proof. hammer_hook "String" "String.index_correct2".  
+Proof. hammer_hook "String" "String.index_correct2".
 intros n m s1 s2; generalize n m s1; clear n m s1; elim s2; simpl;
 auto.
 intros n; case n; simpl; auto.
@@ -279,7 +279,7 @@ intros H0 H; injection H as <-; auto.
 intros p H2 H3; inversion H3.
 case m; simpl; auto.
 case (index 0 s1 s2'); intros; discriminate.
-intros m'; generalize (Rec 0 m' s1); case (index 0 s1 s2'); auto.
+intros m'; generalize (Rec O m' s1); case (index O s1 s2'); auto.
 intros x H H0 H1 p; try case p; simpl; auto.
 intros H2 H3; red; intros H4; case H0.
 intros H5 H6; absurd (false = true); auto with bool.
@@ -306,7 +306,7 @@ Theorem index_correct3 :
 forall (n m : nat) (s1 s2 : string),
 index n s1 s2 = None ->
 s1 <> EmptyString -> n <= m -> substring m (length s1) s2 <> s1.
-Proof. hammer_hook "String" "String.index_correct3".  
+Proof. hammer_hook "String" "String.index_correct3".
 intros n m s1 s2; generalize n m s1; clear n m s1; elim s2; simpl;
 auto.
 intros n; case n; simpl; auto.
@@ -326,7 +326,7 @@ intros H4 H5; absurd (false = true); auto with bool.
 case s1; simpl; auto.
 intros a s n0 H H0 H1 H2;
 change (substring n0 (length (String a s)) s2' <> String a s);
-apply (Rec 0); auto.
+apply (Rec O); auto.
 generalize H0; case (index 0 (String a s) s2'); simpl; auto; intros;
 discriminate.
 apply Le.le_O_n.
@@ -346,7 +346,7 @@ Transparent prefix.
 Theorem index_correct4 :
 forall (n : nat) (s : string),
 index n EmptyString s = None -> length s < n.
-Proof. hammer_hook "String" "String.index_correct4".  
+Proof. hammer_hook "String" "String.index_correct4".
 intros n s; generalize n; clear n; elim s; simpl; auto.
 intros n; case n; simpl; auto.
 intros; discriminate.
@@ -364,10 +364,5 @@ Qed.
 Definition findex n s1 s2 :=
 match index n s1 s2 with
 | Some n => n
-| None => 0
+| None => O
 end.
-
-
-
-
-

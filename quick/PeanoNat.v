@@ -258,26 +258,6 @@ Qed.
 End Private_Parity.
 Import Private_Parity.
 
-Lemma even_spec : forall n, Nat.even n = true <-> Even n.
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.even_spec".
-fix 1.
-destruct n as [|[|n]]; simpl.
-- split; [ now exists 0 | trivial ].
-- split; [ discriminate | intro H; elim (Even_1 H) ].
-- rewrite even_spec. apply Even_2.
-Qed.
-
-Lemma odd_spec : forall n, Nat.odd n = true <-> Odd n.
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.odd_spec".
-unfold Nat.odd.
-fix 1.
-destruct n as [|[|n]]; simpl.
-- split; [ discriminate | intro H; elim (Odd_0 H) ].
-- split; [ now exists 0 | trivial ].
-- rewrite odd_spec. apply Odd_2.
-Qed.
-
-
 
 Lemma divmod_spec : forall x y q u, u <= y ->
 let (q',u') := Nat.divmod x y q u in
@@ -420,49 +400,7 @@ Qed.
 Definition divide x y := exists z, y=z*x.
 Notation "( x | y )" := (divide x y) (at level 0) : nat_scope.
 
-Lemma gcd_divide : forall a b, (Nat.gcd a b | a) /\ (Nat.gcd a b | b).
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.gcd_divide".
-fix 1.
-intros [|a] b; simpl.
-split.
-now exists 0.
-exists 1. simpl. now rewrite <- plus_n_O.
-fold (b mod (S a)).
-destruct (gcd_divide (b mod (S a)) (S a)) as (H,H').
-set (a':=S a) in *.
-split; auto.
-rewrite (div_mod b a') at 2 by discriminate.
-destruct H as (u,Hu), H' as (v,Hv).
-rewrite Nat.mul_comm.
-exists ((b/a')*v + u).
-rewrite Nat.mul_add_distr_r.
-now rewrite <- Nat.mul_assoc, <- Hv, <- Hu.
-Qed.
 
-Lemma gcd_divide_l : forall a b, (Nat.gcd a b | a).
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.gcd_divide_l".
-intros. apply gcd_divide.
-Qed.
-
-Lemma gcd_divide_r : forall a b, (Nat.gcd a b | b).
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.gcd_divide_r".
-intros. apply gcd_divide.
-Qed.
-
-Lemma gcd_greatest : forall a b c, (c|a) -> (c|b) -> (c|Nat.gcd a b).
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.gcd_greatest".
-fix 1.
-intros [|a] b; simpl; auto.
-fold (b mod (S a)).
-intros c H H'. apply gcd_greatest; auto.
-set (a':=S a) in *.
-rewrite (div_mod b a') in H' by discriminate.
-destruct H as (u,Hu), H' as (v,Hv).
-exists (v - (b/a')*u).
-rewrite Nat.mul_comm in Hv.
-rewrite Nat.mul_sub_distr_r, <- Hv, <- Nat.mul_assoc, <-Hu.
-now rewrite Nat.add_comm, Nat.add_sub.
-Qed.
 
 Lemma gcd_nonneg a b : 0<=Nat.gcd a b.
 Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.gcd_nonneg".   apply Nat.le_0_l. Qed.
@@ -482,29 +420,12 @@ induction n; trivial.
 simpl. f_equal. now rewrite Nat.add_succ_r.
 Qed.
 
-Lemma le_div2 n : Nat.div2 (S n) <= n.
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.le_div2".
-revert n.
-fix 1.
-destruct n; simpl; trivial. apply lt_succ_r.
-destruct n; [simpl|]; trivial. now constructor.
-hammer_hook "PeanoNat" "PeanoNat.Nat.le_div2.subgoal_1".
-Reconstr.ryelles6 (@Coq.Arith.PeanoNat.Nat.div2_decr, @Coq.Arith.PeanoNat.Nat.succ_le_mono, @Coq.Init.Peano.le_S, @Coq.Init.Peano.le_n, @Coq.Arith.PeanoNat.Nat.add_1_r) (@Coq.Init.Peano.lt, @Coq.Init.Peano.gt).
-Qed.
 
 Lemma lt_div2 n : 0 < n -> Nat.div2 n < n.
 Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.lt_div2".
 destruct n.
 - inversion 1.
 - Reconstr.reasy (@Coq.Arith.PeanoNat.Nat.lt_div2) Reconstr.Empty.
-Qed.
-
-Lemma div2_decr a n : a <= S n -> Nat.div2 a <= n.
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.div2_decr".
-destruct a; intros H.
-- simpl. apply Nat.le_0_l.
-- apply Nat.succ_le_mono in H.
-apply le_trans with a; [ apply le_div2 | trivial ].
 Qed.
 
 Lemma double_twice : forall n, Nat.double n = 2*n.
@@ -515,17 +436,6 @@ Qed.
 Lemma testbit_0_l : forall n, Nat.testbit 0 n = false.
 Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.testbit_0_l".
 now induction n.
-Qed.
-
-Lemma testbit_odd_0 a : Nat.testbit (2*a+1) 0 = true.
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.testbit_odd_0".
-unfold Nat.testbit. rewrite odd_spec. now exists a.
-Qed.
-
-Lemma testbit_even_0 a : Nat.testbit (2*a) 0 = false.
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.testbit_even_0".
-unfold Nat.testbit, Nat.odd. rewrite (proj2 (even_spec _)); trivial.
-now exists a.
 Qed.
 
 Lemma testbit_odd_succ' a n : Nat.testbit (2*a+1) (S n) = Nat.testbit a n.
@@ -559,18 +469,6 @@ change (Nat.shiftl a (S n)) with (double (shiftl a n)).
 rewrite double_twice, div2_double. now apply IHn.
 Qed.
 
-Lemma shiftl_spec_low : forall a n m, m<n ->
-Nat.testbit (Nat.shiftl a n) m = false.
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.shiftl_spec_low".
-induction n; intros m H. inversion H.
-change (Nat.shiftl a (S n)) with (Nat.double (Nat.shiftl a n)).
-destruct m; simpl.
-unfold Nat.odd. apply negb_false_iff.
-apply even_spec. exists (Nat.shiftl a n). apply double_twice.
-rewrite double_twice, div2_double. apply IHn.
-now apply Nat.succ_le_mono.
-Qed.
-
 Lemma div2_bitwise : forall op n a b,
 Nat.div2 (Nat.bitwise op (S n) a b) = Nat.bitwise op n (Nat.div2 a) (Nat.div2 b).
 Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.div2_bitwise".
@@ -578,84 +476,6 @@ intros. unfold Nat.bitwise; fold Nat.bitwise.
 destruct (op (Nat.odd a) (Nat.odd b)).
 now rewrite div2_succ_double.
 now rewrite add_0_l, div2_double.
-Qed.
-
-Lemma odd_bitwise : forall op n a b,
-Nat.odd (Nat.bitwise op (S n) a b) = op (Nat.odd a) (Nat.odd b).
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.odd_bitwise".
-intros. unfold Nat.bitwise; fold Nat.bitwise.
-destruct (op (Nat.odd a) (Nat.odd b)).
-apply odd_spec. rewrite Nat.add_comm. eexists; eauto.
-unfold Nat.odd. apply negb_false_iff. apply even_spec.
-rewrite add_0_l; eexists; eauto.
-Qed.
-
-Lemma testbit_bitwise_1 : forall op, (forall b, op false b = false) ->
-forall n m a b, a<=n ->
-Nat.testbit (Nat.bitwise op n a b) m = op (Nat.testbit a m) (Nat.testbit b m).
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.testbit_bitwise_1".
-intros op Hop.
-induction n; intros m a b Ha.
-simpl. inversion Ha; subst. now rewrite testbit_0_l.
-destruct m.
-apply odd_bitwise.
-unfold Nat.testbit; fold Nat.testbit. rewrite div2_bitwise.
-apply IHn. now apply div2_decr.
-Qed.
-
-Lemma testbit_bitwise_2 : forall op, op false false = false ->
-forall n m a b, a<=n -> b<=n ->
-Nat.testbit (Nat.bitwise op n a b) m = op (Nat.testbit a m) (Nat.testbit b m).
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.testbit_bitwise_2".
-intros op Hop.
-induction n; intros m a b Ha Hb.
-simpl. inversion Ha; inversion Hb; subst. now rewrite testbit_0_l.
-destruct m.
-apply odd_bitwise.
-unfold Nat.testbit; fold Nat.testbit. rewrite div2_bitwise.
-apply IHn; now apply div2_decr.
-Qed.
-
-Lemma land_spec a b n :
-Nat.testbit (Nat.land a b) n = Nat.testbit a n && Nat.testbit b n.
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.land_spec".
-unfold Nat.land. apply testbit_bitwise_1; trivial.
-Qed.
-
-Lemma ldiff_spec a b n :
-Nat.testbit (Nat.ldiff a b) n = Nat.testbit a n && negb (Nat.testbit b n).
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.ldiff_spec".
-unfold Nat.ldiff. apply testbit_bitwise_1; trivial.
-Qed.
-
-Lemma lor_spec a b n :
-Nat.testbit (Nat.lor a b) n = Nat.testbit a n || Nat.testbit b n.
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.lor_spec".
-unfold Nat.lor. apply testbit_bitwise_2.
-- trivial.
-- destruct (Nat.compare_spec a b).
-+ rewrite max_l; subst; trivial.
-+ apply Nat.lt_le_incl in H. now rewrite max_r.
-+ apply Nat.lt_le_incl in H. now rewrite max_l.
-- destruct (Nat.compare_spec a b).
-+ rewrite max_r; subst; trivial.
-+ apply Nat.lt_le_incl in H. now rewrite max_r.
-+ apply Nat.lt_le_incl in H. now rewrite max_l.
-Qed.
-
-Lemma lxor_spec a b n :
-Nat.testbit (Nat.lxor a b) n = xorb (Nat.testbit a n) (Nat.testbit b n).
-Proof. hammer_hook "PeanoNat" "PeanoNat.Nat.lxor_spec".
-unfold Nat.lxor. apply testbit_bitwise_2.
-- trivial.
-- destruct (Nat.compare_spec a b).
-+ rewrite max_l; subst; trivial.
-+ apply Nat.lt_le_incl in H. now rewrite max_r.
-+ apply Nat.lt_le_incl in H. now rewrite max_l.
-- destruct (Nat.compare_spec a b).
-+ rewrite max_r; subst; trivial.
-+ apply Nat.lt_le_incl in H. now rewrite max_r.
-+ apply Nat.lt_le_incl in H. now rewrite max_l.
 Qed.
 
 Lemma div2_spec a : Nat.div2 a = Nat.shiftr a 1.
