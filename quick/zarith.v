@@ -54,7 +54,7 @@ Qed.
 Lemma le_minusni_n : forall n i:Z, i >= 0 -> i <= n -> n - i <= n.
 Proof.
   hammer_hook "zarith" "zarith.lem_minusni_n".
-  Reconstr.reasy (@Coq.ZArith.BinInt.Z.ge_le_iff, @Coq.ZArith.BinInt.Z.le_sub_nonneg) (@Coq.ZArith.BinInt.Z.ge, @Coq.ZArith.BinInt.Z.le).
+  Reconstr.reasy (@Coq.ZArith.BinInt.Z.ge_le, @Coq.ZArith.BinInt.Z.le_sub_nonneg) Reconstr.Empty.
 Qed.
 
 Lemma even_odd_cor :
